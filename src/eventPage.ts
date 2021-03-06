@@ -34,6 +34,13 @@ const downloadImages = async (baseUrl: string, urls: Array<string>, logger: (msg
     urls.map(async (url) => {
       logger(`url: ${url}`);
       const response = await fetch(url);
+
+      const contentType = response.headers.get('Content-Type');
+      logger(`contentType: ${contentType}`);
+      if (contentType && contentType.startsWith('image')) {
+        return url
+      }
+
       const txt = await response.text();
       logger(`txt: ${txt}`);
       const matchResult = txt.match(reg);

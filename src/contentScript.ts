@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return isResponseAsync;
 });
 
-const gatherUrls = () => {
+const gatherUrls = (): Array<string> => {
   const imgs = document.querySelectorAll('.post-content .post-content-body .image-thumbnails  img')
   const baseUrl = location.href;
   console.log(baseUrl);
@@ -29,5 +29,12 @@ const gatherUrls = () => {
     return `${baseUrl}/${parts[2]}/${parts[4]}`
   });
 
-  return urls;
+  const headerImgs = document.querySelectorAll('.the-post .post-thumbnail img');
+  const headerUrls = Array.from(headerImgs).map((img: HTMLImageElement) => {
+    return img.src;
+  });
+
+  console.log('headerUrls', headerUrls);
+
+  return [...headerUrls, ...urls];
 }
