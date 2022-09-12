@@ -18,10 +18,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.urlsReceived) {
     chrome.runtime.sendMessage({ downloadStarted: true });
     logger(`urls Received: ${Object.keys(request)}`);
+    const title: string = request.title;
     const urls: Array<string> = request.urls;
     const baseUrl: string = request.baseUrl;
     isResponseAsync = true;
-    downloadImages(baseUrl, urls, logger)
+    downloadImages(title, baseUrl, urls, logger)
       .then(() => chrome.runtime.sendMessage({ downloadFinished: true }))
       .catch(e => sendResponse({ error: true, message: e.message })) ;
   }
@@ -29,7 +30,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return isResponseAsync;
 });
 
-const downloadImages = async (baseUrl: string, urls: Array<string>, logger: (msg: String) => void) => {
+const downloadImages = async (title: string, baseUrl: string, urls: Array<string>, logger: (msg: String) => void) => {
   const imageUrls = (await Promise.all(
     urls.map(async (url) => {
       logger(`url: ${url}`);
@@ -59,7 +60,7 @@ const downloadImages = async (baseUrl: string, urls: Array<string>, logger: (msg
   const blobs = await Promise.all(imageUrls.map(async (e, i) => {
     const url = new URL(e);
     const parts = url.pathname.split('/');
-    const filename = parts[parts.length - 1];
+    const filename = `${i}-` + parts[parts.length - 1];
 
     logger(`fetching blob [${i + 1}/${imageUrls.length}]: ${filename}, ${url}`);
     const response = await fetch(e);
@@ -79,7 +80,7 @@ const downloadImages = async (baseUrl: string, urls: Array<string>, logger: (msg
   logger(`blobs: ${blobs.length}`);
 
   const parts = baseUrl.split('/');
-  const zipFilename = `${parts[parts.length - 1]}`;
+  const zipFilename = `${title}_${parts[parts.length - 1]}`;
   const zip = new Zip();
   blobs.forEach(({ blob, filename }) => {
     zip.folder(zipFilename).file(filename, blob);

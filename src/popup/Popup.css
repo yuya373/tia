@@ -13,5 +13,14 @@ body {
     border: 2px solid darkblue;
     color:  darkblue;
     font-size: 20px;
-    width: 150px;
+    width: 300px;
+}
+
+.content {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.planCheckBox {
+    width: 100%;
 }
